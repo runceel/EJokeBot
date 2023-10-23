@@ -1,5 +1,4 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.SemanticKernel;
+﻿using Microsoft.SemanticKernel;
 using System.Threading;
 using System.Threading.Tasks;
 
