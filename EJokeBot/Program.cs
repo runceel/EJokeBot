@@ -14,6 +14,7 @@ using EJokeBot.Options;
 using Microsoft.SemanticKernel;
 using Microsoft.Extensions.Options;
 using EJokeBot.Services;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,7 +31,7 @@ builder.Services.AddTransient(sp =>
         .WithAzureChatCompletionService(
             aoaiSettings.DeploymentName,
             aoaiSettings.Endpoint,
-            aoaiSettings.ApiKey)
+            new DefaultAzureCredential())
         .Build();
 });
 

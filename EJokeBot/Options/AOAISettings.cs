@@ -9,7 +9,4 @@ public class AOAISettings
 
     [Required]
     public string Endpoint { get; set; } = "";
-
-    [Required]
-    public string ApiKey { get; set; } = "";
 }
