@@ -11,31 +11,27 @@ using System.Threading.Tasks;
 using Microsoft.SemanticKernel;
 using Microsoft.Extensions.Configuration;
 using System.IO;
+using Microsoft.Extensions.Logging;
+using EJokeBot.Services;
 
 namespace EJokeBot.Bots
 {
     public class EJokeBot : ActivityHandler
     {
+        private readonly IJokeGenerator _jokeGenerator;
+        private readonly ILogger<EJokeBot> _logger;
+
+        public EJokeBot(IJokeGenerator jokeGenerator, ILogger<EJokeBot> logger)
+        {
+            _jokeGenerator = jokeGenerator;
+            _logger = logger;
+        }
+
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
-            var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
-            var builder = new KernelBuilder();
-            builder.WithAzureChatCompletionService(
-                     configuration["AOAISettings:DeploymentName"], // Azure OpenAI Deployment Name
-                     configuration["AOAISettings:Endpoint"],       // Azure OpenAI Endpoint
-                     configuration["AOAISettings:ApiKey"]);        // Azure OpenAI Key
-            var kernel = builder.Build();
-            var prompt = @"貴方は漫才師です。以下の文章・単語を使ってエンジニアが楽しめるジョークを１００文字位で作ってください。
-
-{{$input}}";
-            var joke = kernel.CreateSemanticFunction(prompt);
-
             // output diagnostic message
-            System.Diagnostics.Trace.TraceError($"user input is {turnContext.Activity.Text}");
-
-            var reply = await joke.InvokeAsync(turnContext.Activity.Text, kernel); //$"Echo v2: {turnContext.Activity.Text}";
-            var replyText = reply.ToString();
-
+            _logger.LogTrace("user input is {userInput}", turnContext.Activity.Text);
+            var replyText = await _jokeGenerator.GenerateJokeAsync(turnContext.Activity.Text, cancellationToken);
             await turnContext.SendActivityAsync(MessageFactory.Text(replyText, replyText), cancellationToken);
         }
 
