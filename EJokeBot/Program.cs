@@ -27,7 +27,7 @@ builder.Services.AddOptions<AOAISettings>()
 builder.Services.AddTransient(sp =>
 {
     var aoaiSettings = sp.GetRequiredService<IOptions<AOAISettings>>().Value;
-    return Kernel.Builder
+    return new KernelBuilder()
         .WithAzureChatCompletionService(
             aoaiSettings.DeploymentName,
             aoaiSettings.Endpoint,
